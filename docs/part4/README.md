@@ -77,43 +77,7 @@ cargo run
 
 **Exercise 1.2:** Add a variable `blink_count` and log how many times the LED has toggled.
 
-**Solution 1.1:**
-
-```rust
-fn blink_pattern(led: &mut PinDriver<'_, impl OutputPin, Output>, 
-                 pattern: &[(bool, u32)]) -> anyhow::Result<()> {
-    for (state, duration_ms) in pattern {
-        if *state {
-            led.set_high()?;
-        } else {
-            led.set_low()?;
-        }
-        FreeRtos::delay_ms(*duration_ms);
-    }
-    Ok(())
-}
-
-// SOS pattern: ... --- ...
-const DOT: u32 = 150;
-const DASH: u32 = 450;
-const GAP: u32 = 150;
-const LETTER_GAP: u32 = 450;
-
-let sos: Vec<(bool, u32)> = vec![
-    // S: ...
-    (true, DOT), (false, GAP),
-    (true, DOT), (false, GAP),
-    (true, DOT), (false, LETTER_GAP),
-    // O: ---
-    (true, DASH), (false, GAP),
-    (true, DASH), (false, GAP),
-    (true, DASH), (false, LETTER_GAP),
-    // S: ...
-    (true, DOT), (false, GAP),
-    (true, DOT), (false, GAP),
-    (true, DOT), (false, LETTER_GAP),
-];
-```
+**[Solutions for Lab 1](lab1-solutions.md)**
 
 ---
 
@@ -182,6 +146,8 @@ fn main() -> anyhow::Result<()> {
 **Exercise 2.1:** Implement a "long press" detector that triggers after holding for 2 seconds.
 
 **Exercise 2.2:** Create a mode toggle—short press cycles through 3 LED blink speeds.
+
+**[Solutions for Lab 2](lab2-solutions.md)**
 
 ---
 
@@ -284,6 +250,8 @@ fn main() -> anyhow::Result<()> {
 **Exercise 3.1:** Implement automatic reconnection with exponential backoff.
 
 **Exercise 3.2:** Store WiFi credentials in NVS (non-volatile storage) so they survive reboots.
+
+**[Solutions for Lab 3](lab3-solutions.md)**
 
 ---
 
@@ -404,6 +372,8 @@ fn main() -> anyhow::Result<()> {
 **Exercise 4.1:** Add a `/health` endpoint that returns system status.
 
 **Exercise 4.2:** Implement a `/led` POST endpoint that accepts `{"state": "on"}` or `{"state": "off"}`.
+
+**[Solutions for Lab 4](lab4-solutions.md)**
 
 ---
 
