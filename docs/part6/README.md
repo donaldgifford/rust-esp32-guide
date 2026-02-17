@@ -10,6 +10,10 @@
 
 ## Common Build Errors
 
+**Error: `can't find crate for core` or wrong target**
+
+See [Part 1 Section 1.7](../part1/README.md#17-common-setup-issues) — this is usually a toolchain selection issue caused by missing `export-esp.sh` or a version manager (mise/asdf) overriding `rust-toolchain.toml`.
+
 **Error: `esp-idf-sys` build fails**
 
 ```bash

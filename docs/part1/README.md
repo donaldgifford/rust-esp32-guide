@@ -51,8 +51,12 @@ cargo install espup
 # Install the ESP Rust toolchain (includes Xtensa support)
 espup install
 
-# Source the export file (add to your .zshrc for persistence)
+# Source the export file — required in every new terminal
 source "$HOME/export-esp.sh"
+
+# Add to your shell config for persistence:
+# echo 'source "$HOME/export-esp.sh"' >> ~/.zshrc
+# Or add to ~/.zshenv if you want it available in non-interactive shells too
 
 # Install additional tools
 cargo install cargo-espflash    # For flashing firmware
@@ -114,3 +118,87 @@ cargo build
 ```
 
 If this builds successfully, your environment is ready.
+
+## 1.7 Common Setup Issues
+
+### `can't find crate for core` / target not installed
+
+```
+error[E0463]: can't find crate for `core`
+  = note: the `riscv32imac-esp-espidf` target may not be installed
+```
+
+This error is misleading — `rustup target add riscv32imac-esp-espidf` won't work because this isn't a standard rustup target. It's provided by the ESP toolchain.
+
+**Check that `export-esp.sh` is sourced** in your current terminal:
+
+```bash
+source "$HOME/export-esp.sh"
+```
+
+**Check the active toolchain** inside the project directory:
+
+```bash
+cd hello-esp32
+rustup show active-toolchain
+```
+
+It should show `esp` or `nightly` (depending on what `rust-toolchain.toml` specifies), not your default stable toolchain.
+
+### Tool version managers (mise, asdf, rtx) overriding the toolchain
+
+If you use `mise`, `asdf`, or similar tools to manage Rust versions, they will override `rust-toolchain.toml` and force a standard toolchain that doesn't know about ESP32 targets.
+
+Check if mise is pinning Rust:
+
+```bash
+mise ls rust
+```
+
+If it shows an active Rust version for your project directory, remove it:
+
+```bash
+mise unset rust --local
+```
+
+Then verify the correct toolchain is active:
+
+```bash
+rustup show active-toolchain
+# Should show "esp" or "nightly", not a standard version like "1.93.1-aarch64-apple-darwin"
+```
+
+### rust-analyzer not found for the `esp` toolchain
+
+If your editor shows:
+
+```
+'rust-analyzer' is not installed for the custom toolchain 'esp'
+```
+
+The `esp` toolchain is custom and doesn't ship with rust-analyzer. Symlink it from stable:
+
+```bash
+ln -s ~/.rustup/toolchains/stable-aarch64-apple-darwin/bin/rust-analyzer \
+      ~/.rustup/toolchains/esp/bin/rust-analyzer
+```
+
+Note: if your project's `rust-toolchain.toml` says `channel = "nightly"` rather than `channel = "esp"`, add rust-analyzer to nightly instead:
+
+```bash
+rustup component add rust-analyzer --toolchain nightly
+```
+
+### Project structure: don't use Cargo workspaces
+
+Each ESP-IDF project is self-contained with its own `.cargo/config.toml` (build target), `build.rs`, and `sdkconfig.defaults`. Cargo workspaces don't inherit `.cargo/config.toml` from member directories, which breaks target selection and causes errors like:
+
+```
+Error: Unsupported target 'aarch64-apple-darwin'
+```
+
+Keep each lab as a separate project directory and open your editor in the specific project:
+
+```bash
+cd hello-esp32 && nvim .
+```
